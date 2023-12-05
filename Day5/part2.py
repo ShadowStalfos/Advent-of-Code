@@ -1,6 +1,35 @@
 def argsort(seq):
     return 
 
+class SeedFinder():
+    def __init__(self):
+        self.seed_lower = []
+        self.seed_upper = []
+    
+    def add_seeds(self, lower, range_len):
+        self.seed_lower.append(lower)
+        self.seed_upper.append(lower+range_len-1)
+    
+    def sort(self):
+        indexes = sorted(range(len(self.seed_lower)), key=self.seed_lower.__getitem__)
+        self.seed_lower = [self.seed_lower[i] for i in indexes]
+        self.seed_upper = [self.seed_upper[i] for i in indexes]
+    
+    def seed_exists(self, seed):
+        if x < self.seed_lower[0]:
+            return False
+
+        i = 0
+        while i < len(self.seed_lower) and x > self.seed_lower[i]:
+            i+=1
+        i-=1
+
+        if x < self.seed_upper[i]:
+            return True
+
+        return False
+
+
 class Sourcemapper():
     def __init__(self):
         self.source_lower = []
@@ -57,6 +86,11 @@ class AutoMapper():
     def sort_maps(self):
         for seed_map in self.maps:
             seed_map.sort()
+        
+    def loc_to_seed(self, loc):
+        x = loc
+        for seed_map in self.maps[:-1]:
+            x = seed_map
 
 
 mapper = AutoMapper()
@@ -73,8 +107,12 @@ with open("./Day5/almanac.txt") as f:
             map_i += 1
     mapper.sort_maps()
     lowest_loc = 10**99
-    for seed in seeds.split(" ")[1:]:
+    seeds = seeds.split(" ")[1:]
+    for i in range(0,len(seeds), 2):
+        for loc in range(seeds[i], seeds[i+1]):
+
         loc = mapper.map_seed(int(seed))
+        print(loc)
         if loc<lowest_loc:
             lowest_loc = loc
 print(lowest_loc)
