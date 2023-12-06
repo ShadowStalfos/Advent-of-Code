@@ -1,6 +1,3 @@
-def argsort(seq):
-    return 
-
 class Sourcemapper():
     def __init__(self):
         self.source_lower = []
