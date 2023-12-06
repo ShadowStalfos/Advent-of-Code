@@ -1,10 +1,10 @@
 from math import ceil, sqrt, floor
-A = -1
-B = 58996469
-C = -478223210191071
-D = B**2-4*A*C
-a = ceil((-B+sqrt(D))/(2*A))
-b = floor((-B-sqrt(D))/(2*A))
-print(a)
-print(b)
-print(b-a)
+b = -58996469
+c = 478223210191071
+
+b1 = floor((b + sqrt(pow(b, 2) - 4 * c))/2)
+b2 = ceil((b - sqrt(pow(b, 2) - 4 * c))/2)
+
+print(b1)
+print(b2)
+print(b1-b2+1)
