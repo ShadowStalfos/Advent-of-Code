@@ -24,19 +24,34 @@ class Sourcemapper():
     def map_range(self, range_tup):
         lower, upper = range_tup
         ranges = []
-        if lower < self.source_lower[0]:
-            ranges.append((lower, min(upper, self.source_lower[0]-1)))
-            lower = min(self.source_lower[0], upper)
-        
         if lower == upper:
+            for i in range(len(self.source_lower)):
+                source_lower = self.source_lower[i]
+                source_upper = self.source_upper[i]
+                if lower < source_lower:
+                    ranges.append((lower, min(upper, source_lower-1)))
+                    return ranges
+                if source_lower <= lower <= source_upper and lower != upper:
+                    ranges.append((self.get_dest(lower, i), self.get_dest(min(upper, source_upper), i)))
+                    return ranges
+            else:
+                ranges.append((lower, upper))
+                return ranges
+
+        for i in range(len(self.source_lower)):
+            source_lower = self.source_lower[i]
+            source_upper = self.source_upper[i]
+            if lower < source_lower:
+                ranges.append((lower, min(upper, source_lower-1)))
+                lower = min(source_lower, upper)
+            if source_lower <= lower <= source_upper and lower != upper:
+                ranges.append((self.get_dest(lower, i), self.get_dest(min(upper, source_upper), i)))
+                lower = min(upper, source_upper)
+            if lower == upper:
+                return ranges
+        else:
+            ranges.append((lower, upper))
             return ranges
-        
-        i = 0
-        while i < len(self.source_lower) and upper < self.source_lower[i]:
-            i+=1
-        for j in range(i):
-            ranges.append((lower, self.get_dest(lower, j)))
-        return ranges
 
 class AutoMapper():
     def __init__(self):
@@ -58,7 +73,6 @@ class AutoMapper():
         return self.recursive_map(ranges, 0)
     
     def recursive_map(self, range_tup, map_i):
-        print(map_i)
         ranges = self.maps[map_i].map_range(range_tup)
         if map_i == len(self.maps)-1:
             return ranges[0][0]
@@ -89,7 +103,6 @@ with open("./Day5/almanac.txt") as f:
     seeds = seeds.split(" ")[1:]
     for i in range(0,len(seeds), 2):
         loc = mapper.map_seed(int(seeds[i]), int(seeds[i+1]))
-        print(loc)
         if loc<lowest_loc:
             lowest_loc = loc
 print(lowest_loc)
