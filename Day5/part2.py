@@ -1,4 +1,3 @@
-from copy import copy
 class Sourcemapper():
     def __init__(self):
         self.source_lower = []
@@ -18,6 +17,7 @@ class Sourcemapper():
         self.source_upper = [self.source_upper[i] for i in indexes]
         self.desination = [self.desination[i] for i in indexes]
         self.desination_upper = [self.desination_upper[i] for i in indexes]
+
     def get_dest(self, source, i):
         return self.desination[i]+source-self.source_lower[i]
     
@@ -31,7 +31,7 @@ class Sourcemapper():
                 if lower < source_lower:
                     ranges.append((lower, min(upper, source_lower-1)))
                     return ranges
-                if source_lower <= lower <= source_upper and lower != upper:
+                elif source_lower <= lower <= source_upper and lower != upper:
                     ranges.append((self.get_dest(lower, i), self.get_dest(min(upper, source_upper), i)))
                     return ranges
             else:
