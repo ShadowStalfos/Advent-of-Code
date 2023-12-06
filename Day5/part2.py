@@ -1,67 +1,42 @@
-def argsort(seq):
-    return 
-
-class SeedFinder():
-    def __init__(self):
-        self.seed_lower = []
-        self.seed_upper = []
-    
-    def add_seeds(self, lower, range_len):
-        self.seed_lower.append(lower)
-        self.seed_upper.append(lower+range_len-1)
-    
-    def sort(self):
-        indexes = sorted(range(len(self.seed_lower)), key=self.seed_lower.__getitem__)
-        self.seed_lower = [self.seed_lower[i] for i in indexes]
-        self.seed_upper = [self.seed_upper[i] for i in indexes]
-    
-    def seed_exists(self, seed):
-        if x < self.seed_lower[0]:
-            return False
-
-        i = 0
-        while i < len(self.seed_lower) and x > self.seed_lower[i]:
-            i+=1
-        i-=1
-
-        if x < self.seed_upper[i]:
-            return True
-
-        return False
-
-
+from copy import copy
 class Sourcemapper():
     def __init__(self):
         self.source_lower = []
         self.source_upper = []
         self.desination = []
+        self.desination_upper = []
     
     def source2dest(self, source, destination, range_len):
         self.source_lower.append(source)
         self.source_upper.append(source+range_len-1)
         self.desination.append(destination)
+        self.desination_upper.append(destination+range_len-1)
 
     def sort(self):
         indexes = sorted(range(len(self.source_lower)), key=self.source_lower.__getitem__)
         self.source_lower = [self.source_lower[i] for i in indexes]
         self.source_upper = [self.source_upper[i] for i in indexes]
         self.desination = [self.desination[i] for i in indexes]
+        self.desination_upper = [self.desination_upper[i] for i in indexes]
+    def get_dest(self, source, i):
+        return self.desination[i]+source-self.source_lower[i]
     
-    def map(self, x):
-        if x < self.source_lower[0]:
-            return x
-
+    def map_range(self, range_tup):
+        lower, upper = range_tup
+        ranges = []
+        if lower < self.source_lower[0]:
+            ranges.append((lower, min(upper, self.source_lower[0]-1)))
+            lower = min(self.source_lower[0], upper)
+        
+        if lower == upper:
+            return ranges
+        
         i = 0
-        while i < len(self.source_lower) and x > self.source_lower[i]:
+        while i < len(self.source_lower) and upper < self.source_lower[i]:
             i+=1
-        i-=1
-
-        if x < self.source_upper[i]:
-            return self.desination[i]+(x-self.source_lower[i])
-
-        return x
-
-    
+        for j in range(i):
+            ranges.append((lower, self.get_dest(lower, j)))
+        return ranges
 
 class AutoMapper():
     def __init__(self):
@@ -77,22 +52,26 @@ class AutoMapper():
     def source2dest(self, source, destination, range_len, map_i):
         self.maps[map_i].source2dest(source, destination, range_len)
     
-    def map_seed(self, seed):
-        x = seed
-        for seed_map in self.maps:
-            x = seed_map.map(x)
-        return x
-
+    def map_seed(self, lower, range_len):
+        upper = lower+range_len-1
+        ranges = (lower, upper)
+        return self.recursive_map(ranges, 0)
+    
+    def recursive_map(self, range_tup, map_i):
+        print(map_i)
+        ranges = self.maps[map_i].map_range(range_tup)
+        if map_i == len(self.maps)-1:
+            return ranges[0][0]
+        
+        locs = []
+        for r in ranges:
+            locs.append(self.recursive_map(r, map_i+1))
+        return min(locs)
+        
     def sort_maps(self):
         for seed_map in self.maps:
             seed_map.sort()
         
-    def loc_to_seed(self, loc):
-        x = loc
-        for seed_map in self.maps[:-1]:
-            x = seed_map
-
-
 mapper = AutoMapper()
 
 with open("./Day5/almanac.txt") as f:
@@ -109,9 +88,7 @@ with open("./Day5/almanac.txt") as f:
     lowest_loc = 10**99
     seeds = seeds.split(" ")[1:]
     for i in range(0,len(seeds), 2):
-        for loc in range(seeds[i], seeds[i+1]):
-
-        loc = mapper.map_seed(int(seed))
+        loc = mapper.map_seed(int(seeds[i]), int(seeds[i+1]))
         print(loc)
         if loc<lowest_loc:
             lowest_loc = loc
