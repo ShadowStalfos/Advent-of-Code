@@ -1,13 +1,13 @@
 from aocd import get_data
 import numpy as np
 
-TEST = True
+TEST = False
 
 if TEST:
-    with open("./2024/Day2 - Red-Nosed Reports/example.txt") as f:
+    with open(f"{os.path.split(os.path.abspath(__file__))[0]}\\example.txt", "r", encoding="utf-8") as f:
         data = f.read()
 else:
-    data = get_data(day=2, year=2024)
+    data = get_data(day=int(__file__.split("\\")[-2].split(" -")[0][-1]), year=2024)
 
 def test_sequence(sequence):
     direction = np.sign(int(sequence[1]) - int(sequence[0]))
