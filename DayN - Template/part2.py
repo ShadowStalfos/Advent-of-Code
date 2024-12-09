@@ -4,7 +4,7 @@ from aocd import get_data
 import numpy as np
 import os
 
-TEST = False
+TEST = True
 
 if TEST:
     with open(f"{os.path.split(os.path.abspath(__file__))[0]}\\example.txt", "r", encoding="utf-8") as f:
