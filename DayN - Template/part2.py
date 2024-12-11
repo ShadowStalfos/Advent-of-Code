@@ -15,7 +15,7 @@ else:
         day = day[-2:]
     else:
         day = day[-1]
-    data = get_data(day=day, year=2024)
+    data = get_data(day=int(day), year=2024)
 
 reports = [x.split(" ") for x in data.split("\n")]
 print(reports)
